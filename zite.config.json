@@ -1,0 +1,16 @@
+{
+  "project": {
+    "name": "UAE Hotel Tariff",
+    "basePublicIdentifier": "81ff216789a3ea7b"
+  },
+  "integrations": {
+    "openai": {
+      "type": "openai",
+      "connectionId": "svc_433471"
+    },
+    "github": {
+      "type": "github",
+      "connectionId": "svc_586442"
+    }
+  }
+}

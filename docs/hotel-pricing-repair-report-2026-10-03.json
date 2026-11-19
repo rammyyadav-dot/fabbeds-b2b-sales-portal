@@ -1,0 +1,32 @@
+{
+  "date": "2026-10-03",
+  "scope": "Admin Extranet + Sales Portal hotel pricing",
+  "database": {
+    "activeHotels": 39,
+    "activeRoomTypes": 371,
+    "activeRatePlans": 93,
+    "dailyRates": 12814,
+    "quarantinedDailyRates": 3802,
+    "activeRatePlansMissingHotel": 0,
+    "activeRatePlansMissingRoomType": 0,
+    "activeRatePlansMissingMealMaster": 0,
+    "activeRatePlanMealMasterMismatches": 0,
+    "activeEventsWithoutHotel": 0,
+    "nonAedDailyRates": 2,
+    "nonAedUnquarantined": 0,
+    "zeroPositiveRateUnquarantined": 0,
+    "duplicateEffectiveKeysUnquarantined": 0
+  },
+  "safety": {
+    "historicalRowsDeleted": false,
+    "currencyConverted": false,
+    "missingRatesMadeSellable": false,
+    "onRequestConvertedToFreeSale": false
+  },
+  "acceptance": {
+    "sharedPricingEngine": "PASS",
+    "salesCheck": "PASS",
+    "adminCheck": "PASS",
+    "databaseCommercialIntegrity": "PARTIAL"
+  }
+}

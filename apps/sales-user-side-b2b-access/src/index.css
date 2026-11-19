@@ -1,0 +1,194 @@
+@import url("https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap");
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Backfilled during migration to 2.0 */
+    --font-serif: ui-serif;
+
+    --background: 0 0% 97%;
+    --foreground: 0 0% 7%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 7%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 7%;
+
+    --primary: 357 81% 47%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 0 0% 7%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 0 0% 93%;
+    --muted-foreground: 0 0% 36%;
+
+    --accent: 357 92% 95%;
+    --accent-foreground: 357 81% 37%;
+
+    --destructive: 0 66.3866% 46.6667%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 0 0% 82%;
+    --input: 0 0% 82%;
+    --ring: 357 81% 47%;
+
+    --chart-1: 357 81% 47%;
+    --chart-2: 6 74% 55%;
+    --chart-3: 345 67% 40%;
+    --chart-4: 0 0% 20%;
+    --chart-5: 0 0% 8%;
+
+    --radius: 0.375rem;
+
+    --sidebar-background: 33.7500 34.7826% 90.9804%;
+    --sidebar-foreground: 8.8889 27.8351% 19.0196%;
+    --sidebar-primary: 357 81% 47%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 357 65% 93%;
+    --sidebar-accent-foreground: 357 64% 31%;
+    --sidebar-border: 33.9130 27.0588% 83.3333%;
+    --sidebar-ring: 357 81% 47%;
+
+    --font-sans: 'Archivo', Arial, sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+    --shadow-x: 0;
+    --shadow-y: 1px;
+    --shadow-blur: 3px;
+    --shadow-spread: 0px;
+    --shadow-opacity: 0.1;
+    --shadow-color: #000000;
+    --shadow-rgb: 0 0 0;
+
+    --shadow-2xs: var(--shadow-x) var(--shadow-y) var(--shadow-blur) var(--shadow-spread) rgb(var(--shadow-rgb) / calc(var(--shadow-opacity) * 0.5));
+    --shadow-xs: var(--shadow-x) var(--shadow-y) var(--shadow-blur) var(--shadow-spread) rgb(var(--shadow-rgb) / calc(var(--shadow-opacity) * 0.5));
+    --shadow-sm: var(--shadow-x) var(--shadow-y) var(--shadow-blur) var(--shadow-spread) rgb(var(--shadow-rgb) / var(--shadow-opacity)), var(--shadow-x) calc(var(--shadow-y) / 4) calc(var(--shadow-blur) / 2) calc(var(--shadow-spread) - 1px) rgb(var(--shadow-rgb) / var(--shadow-opacity));
+    --shadow: var(--shadow-x) var(--shadow-y) var(--shadow-blur) var(--shadow-spread) rgb(var(--shadow-rgb) / var(--shadow-opacity)), var(--shadow-x) calc(var(--shadow-y) / 2) calc(var(--shadow-blur) / 2) calc(var(--shadow-spread) - 1px) rgb(var(--shadow-rgb) / var(--shadow-opacity));
+    --shadow-md: var(--shadow-x) var(--shadow-y) var(--shadow-blur) var(--shadow-spread) rgb(var(--shadow-rgb) / var(--shadow-opacity)), var(--shadow-x) calc(var(--shadow-y) / 2) calc(var(--shadow-blur) * 2) calc(var(--shadow-spread) - 1px) rgb(var(--shadow-rgb) / var(--shadow-opacity));
+    --shadow-lg: var(--shadow-x) var(--shadow-y) var(--shadow-blur) var(--shadow-spread) rgb(var(--shadow-rgb) / var(--shadow-opacity)), var(--shadow-x) var(--shadow-y) calc(var(--shadow-blur) * 3) calc(var(--shadow-spread) - 1px) rgb(var(--shadow-rgb) / var(--shadow-opacity));
+    --shadow-xl: var(--shadow-x) var(--shadow-y) var(--shadow-blur) var(--shadow-spread) rgb(var(--shadow-rgb) / var(--shadow-opacity)), var(--shadow-x) calc(var(--shadow-y) * 2) calc(var(--shadow-blur) * 5) calc(var(--shadow-spread) - 1px) rgb(var(--shadow-rgb) / var(--shadow-opacity));
+    --shadow-2xl: var(--shadow-x) var(--shadow-y) var(--shadow-blur) var(--shadow-spread) rgb(var(--shadow-rgb) / calc(var(--shadow-opacity) * 2.5));
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    letter-spacing: -0.01em;
+  }
+
+  h1, h2, h3 {
+    letter-spacing: -0.035em;
+  }
+
+  ::selection {
+    background: #D71921;
+    color: #fff;
+  }
+}
+
+@layer components {
+  .fb-display {
+    font-family: 'Archivo', Arial, sans-serif;
+    font-weight: 900;
+    letter-spacing: -0.055em;
+    line-height: 0.9;
+    text-transform: uppercase;
+  }
+
+  .fb-kicker {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  .fb-panel-dark {
+    background: #111111;
+    color: #ffffff;
+  }
+
+  .fb-metallic-text {
+    background-image:
+      linear-gradient(
+        110deg,
+        #ffffff 0%,
+        #9ca3af 18%,
+        #ffffff 36%,
+        #f3f4f6 52%,
+        #9ca3af 72%,
+        #ffffff 100%
+      );
+    background-size: 220% 100%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+    will-change: transform, background-position;
+  }
+
+  .fb-panel-red {
+    background: #D71921;
+    color: #ffffff;
+  }
+
+  .fb-outline-title {
+    color: transparent;
+    -webkit-text-stroke: 1.5px rgba(255,255,255,.92);
+    text-stroke: 1.5px rgba(255,255,255,.92);
+  }
+
+  .fb-card {
+    border-radius: 0.5rem;
+    border: 1px solid hsl(var(--border));
+    background: #fff;
+    box-shadow: 0 0 0 0 rgba(0,0,0,0);
+    transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+  }
+
+  .fb-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(215,25,33,.5);
+    box-shadow: 0 18px 40px rgba(0,0,0,.08);
+  }
+
+  .brand-marquee-track {
+    display: flex;
+    width: max-content;
+    animation: brand-marquee 42s linear infinite;
+    will-change: transform;
+  }
+
+  .brand-marquee-track:hover {
+    animation-play-state: paused;
+  }
+
+  .brand-marquee-track-reverse {
+    animation-direction: reverse;
+    animation-duration: 52s;
+  }
+}
+
+@keyframes brand-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .brand-marquee-track {
+    animation: none;
+    overflow-x: auto;
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "name": "uae-hotel-tariff",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "dependencies": {
+    "zitejs": "0.10.11"
+  }
+}
