@@ -1,0 +1,13 @@
+{
+  "seoSettings": {
+    "title": "extranet",
+    "description": "",
+    "thumbnailUrl": "",
+    "faviconUrl": ""
+  },
+  "id": "nwxaykdrxs",
+  "authentication": {
+    "signup": "disabled"
+  },
+  "envVars": {}
+}

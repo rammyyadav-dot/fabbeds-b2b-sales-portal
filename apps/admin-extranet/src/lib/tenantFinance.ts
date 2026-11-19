@@ -1,0 +1,12 @@
+import {zite} from 'zitejs/db';
+import {ZiteError} from 'zitejs/backend';
+export const exposureQuery="SELECT COALESCE(SUM(minor),0) AS used, COUNT(*) AS open, COUNT(*) FILTER(WHERE due<CURRENT_DATE) AS overdue, COUNT(*) FILTER(WHERE due IS NULL OR invalid) AS unknown FROM (\n SELECT ROUND(GREATEST(COALESCE(b.\"sellTotal\",0),0)*100) AS minor,b.\"creditDueDate\"::date AS due, (b.\"sellTotal\" IS NULL OR b.\"sellTotal\"<0) AS invalid FROM \"Bookings\" b JOIN \"BookingsPartnerAccounts\" l ON l.\"bookingsId\"=b.id WHERE l.\"partnerAccountsId\"=$1 AND COALESCE(b.\"creditSettlementStatus\",'Open')='Open' AND COALESCE(b.\"status\",'Pending') NOT IN ('Cancelled','Rejected')\n UNION ALL\n SELECT ROUND(GREATEST(COALESCE(b.\"totalSellPrice\",0),0)*100),b.\"creditDueDate\"::date,(b.\"totalSellPrice\" IS NULL OR b.\"totalSellPrice\"<0) FROM \"AttractionBookings\" b JOIN \"AttractionBookingsPartnerAccounts\" l ON l.\"attractionBookingsId\"=b.id WHERE l.\"partnerAccountsId\"=$1 AND COALESCE(b.\"creditSettlementStatus\",'Open')='Open' AND COALESCE(b.\"reservationStatus\",b.\"bookingStatus\",'Awaiting Confirmation') NOT IN ('Cancelled','Rejected','Completed')\n) q";
+export async function tenantExposure(id:string){const r=await zite.sql({query:exposureQuery,params:[id]});const a=r.rows[0]??{};return {used:Number(a.used??0),open:Number(a.open??0),overdue:Number(a.overdue??0),unknown:Number(a.unknown??0)};}
+export function policySnapshot(a:{creditLimitAed?:number;creditStatus?:string;creditTermsDays?:number;accountStatus?:string}){
+ return JSON.stringify([Math.round((a.creditLimitAed??0)*100),a.creditStatus??'Pending Review',a.creditTermsDays??0,a.accountStatus??'Unknown']);
+}
+export function validateCredit(limitMinor:number,status:string,terms:number,exposure:{used:number;overdue:number;unknown:number}){
+ if(!Number.isSafeInteger(limitMinor)||limitMinor<0||!Number.isInteger(terms)||terms<0||terms>365||!['Pending Review','Approved','On Hold','Disabled'].includes(status))throw new ZiteError({code:'BAD_REQUEST',message:'Invalid credit policy'});
+ if(limitMinor<exposure.used)throw new ZiteError({code:'BAD_REQUEST',message:'Credit limit cannot be below current open exposure'});
+ if(status==='Approved'&&(limitMinor<=0||terms<=0||exposure.overdue>0||exposure.unknown>0))throw new ZiteError({code:'BAD_REQUEST',message:'Approval requires a positive limit, terms, and no overdue or incomplete exposure'});
+}
