@@ -1,3 +1,4 @@
+import { requireStaff } from '../lib/requireStaff';
 import { enrichCurrentUser } from '../lib/currentUser';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
@@ -20,6 +21,7 @@ const TRANSITIONS: Record<string, string[]> = {
 };
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Create or update a reservation with state-machine status transitions',
   inputSchema: z.object({
     id: z.string().optional(),
@@ -57,6 +59,7 @@ export default createEndpoint({
   }),
   outputSchema: z.object({ id: z.string() }),
   execute: async ({ input, context }) => {
+    await requireStaff(context, 'saveReservation');
     await enrichCurrentUser(context);
     const { id, reason, ...fields } = input;
 

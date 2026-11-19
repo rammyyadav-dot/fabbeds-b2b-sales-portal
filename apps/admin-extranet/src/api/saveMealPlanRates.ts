@@ -1,3 +1,4 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
@@ -10,13 +11,15 @@ const rateSchema = z.object({
 });
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Bulk save meal plan supplement rates for a hotel',
   inputSchema: z.object({
     hotelId: z.string(),
     rates: z.array(rateSchema),
   }),
   outputSchema: z.object({ saved: z.number() }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'saveMealPlanRates');
     const { hotelId, rates } = input;
 
     // Fetch existing records for the hotel

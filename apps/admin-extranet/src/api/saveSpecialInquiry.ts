@@ -1,3 +1,4 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
@@ -19,6 +20,7 @@ async function generateInquiryRef(): Promise<string> {
 }
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Create or update a special / offline inquiry',
   inputSchema: z.object({
     id: z.string().optional(),
@@ -48,7 +50,8 @@ export default createEndpoint({
     adminNotes: z.string().optional(),
   }),
   outputSchema: z.object({ id: z.string(), inquiryRef: z.string().optional() }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'saveSpecialInquiry');
     const { id, ...fields } = input;
     if (id) {
       const res = await zite.specialInquiries.update({ id, record: fields });

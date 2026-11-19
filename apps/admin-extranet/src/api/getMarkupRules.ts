@@ -1,8 +1,10 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Get all markup rules',
   inputSchema: z.object({}),
   outputSchema: z.object({
@@ -21,7 +23,8 @@ export default createEndpoint({
       maxMarkupValue: z.number().optional(),
     })),
   }),
-  execute: async () => {
+  execute: async ({ context }) => {
+    await requireStaff(context, 'getMarkupRules');
     const result = await zite.markupRules.findAll({ limit: 500 });
     return {
       rules: result.records.map(r => ({

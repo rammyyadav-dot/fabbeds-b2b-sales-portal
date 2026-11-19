@@ -1,8 +1,10 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Get activity timeline for a booking',
   inputSchema: z.object({ bookingId: z.string() }),
   outputSchema: z.array(z.object({
@@ -12,7 +14,8 @@ export default createEndpoint({
     createdAt: z.string().optional(),
     createdBy: z.string().optional(),
   })),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'getBookingActivities');
     const result = await zite.bookingActivities.findAll({
       filters: { booking: { contains: input.bookingId } },
       limit: 100,

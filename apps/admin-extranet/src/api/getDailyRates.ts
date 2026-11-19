@@ -1,8 +1,10 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Get daily rates for a hotel/room type within a date range, optionally filtered by rate plan',
   inputSchema: z.object({
     hotelId: z.string().optional(),
@@ -30,7 +32,8 @@ export default createEndpoint({
       ratePlanId: z.string().optional(),
     })),
   }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'getDailyRates');
     const getId = (v: string | string[] | undefined): string | undefined =>
       Array.isArray(v) ? v[0] : v;
 

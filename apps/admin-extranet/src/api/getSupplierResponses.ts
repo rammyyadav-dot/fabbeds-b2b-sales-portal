@@ -1,8 +1,10 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Get supplier responses for a Group/MICE lead',
   inputSchema: z.object({ leadId: z.string() }),
   outputSchema: z.object({
@@ -21,7 +23,8 @@ export default createEndpoint({
       clientSelected: z.boolean().optional(),
     })),
   }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'getSupplierResponses');
     const result = await zite.supplierResponses.findAll({ limit: 200 });
     const responses = result.records
       .filter(r => {

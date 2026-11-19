@@ -1,8 +1,10 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Fetch all DMC staff users',
   inputSchema: z.object({}),
   outputSchema: z.array(z.object({
@@ -15,7 +17,8 @@ export default createEndpoint({
     password: z.string().optional(),
     status: z.string().optional(),
   })),
-  execute: async () => {
+  execute: async ({ context }) => {
+    await requireStaff(context, 'getUsers');
     const { records } = await zite.users.findAll({ limit: 500 });
     // Normalize legacy DB role names to app role names
     const normalizeRole = (role?: string) => {

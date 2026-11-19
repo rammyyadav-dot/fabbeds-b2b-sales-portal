@@ -1,8 +1,10 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Fetch all special / offline inquiries with optional status filter',
   inputSchema: z.object({
     status: z.string().optional(),
@@ -39,7 +41,8 @@ export default createEndpoint({
       submittedAt: z.string().optional(),
     })),
   }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'getSpecialInquiries');
     const filters: any = {};
     if (input.status) filters.status = input.status;
     if (input.inquiryType) filters.inquiryType = input.inquiryType;

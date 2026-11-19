@@ -1,3 +1,4 @@
+import { requireStaff } from '../lib/requireStaff';
 import { enrichCurrentUser } from '../lib/currentUser';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
@@ -6,6 +7,7 @@ import { createEndpoint, ZiteError } from 'zitejs/backend';
 const ALLOWED_FROM = ['Awaiting Supplier Confirmation', 'Rate Dispute'];
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Record supplier confirmation and advance reservation status',
   inputSchema: z.object({
     reservationId: z.string(),
@@ -17,6 +19,7 @@ export default createEndpoint({
   }),
   outputSchema: z.object({ status: z.string() }),
   execute: async ({ input, context }) => {
+    await requireStaff(context, 'recordSupplierConfirmation');
     await enrichCurrentUser(context);
     const res = await zite.reservations.findOne({ id: input.reservationId });
     if (!res) throw new ZiteError({ code: 'NOT_FOUND', message: 'Reservation not found' });

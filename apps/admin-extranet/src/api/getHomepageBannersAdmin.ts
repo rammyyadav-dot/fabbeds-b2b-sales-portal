@@ -1,9 +1,11 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { createEndpoint } from 'zitejs/backend';
 import { zite } from 'zitejs/db';
 import { enrichCurrentUser } from '../lib/currentUser';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Lists homepage campaign banners for fabBeds admin',
   inputSchema: z.object({}),
   outputSchema: z.object({
@@ -29,6 +31,7 @@ export default createEndpoint({
     })),
   }),
   execute: async ({ context }) => {
+    await requireStaff(context, 'getHomepageBannersAdmin');
     await enrichCurrentUser(context);
     const { records } = await zite.homepageCampaignBanners.findAll({ limit: 500 });
     return {

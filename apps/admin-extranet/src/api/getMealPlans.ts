@@ -1,8 +1,10 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Get active meal plans from the master list',
   inputSchema: z.object({}),
   outputSchema: z.object({
@@ -13,7 +15,8 @@ export default createEndpoint({
       sortOrder: z.number().nullable(),
     })),
   }),
-  execute: async () => {
+  execute: async ({ context }) => {
+    await requireStaff(context, 'getMealPlans');
     const { records } = await zite.mealPlans.findAll({
       filters: { status: 'Active' },
       limit: 20,

@@ -1,3 +1,4 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
@@ -23,13 +24,15 @@ const rateRowSchema = z.object({
 });
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Get rate sheet with calculated selling rates',
   inputSchema: z.object({
     hotelId: z.string().optional(),
     seasonId: z.string().optional(),
   }),
   outputSchema: z.object({ rows: z.array(rateRowSchema) }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'getRateSheet');
     const [hotelsResult, roomTypesResult, seasonsResult, netRatesResult, markupRulesResult] = await Promise.all([
       zite.hotels.findAll({ limit: 500 }),
       zite.roomTypes.findAll({ limit: 500 }),

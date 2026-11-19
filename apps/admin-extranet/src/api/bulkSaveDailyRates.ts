@@ -1,3 +1,4 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
@@ -11,6 +12,7 @@ const LAYER_PRIORITY: Record<string, number> = {
 };
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Bulk upsert daily rates per layer with merge semantics and full audit trail',
   inputSchema: z.object({
     roomTypeId: z.string(),
@@ -37,7 +39,8 @@ export default createEndpoint({
     sourceMarketProfile: z.string().trim().max(100).optional(),
   }),
   outputSchema: z.object({ count: z.number(), created: z.number(), updated: z.number() }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'bulkSaveDailyRates');
     if (!input.ratePlanId) {
       throw new Error('Rate Plan is required when saving Daily Rates');
     }

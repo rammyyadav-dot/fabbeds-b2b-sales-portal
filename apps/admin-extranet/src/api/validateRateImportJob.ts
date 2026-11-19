@@ -1,8 +1,10 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Validate all lines in a rate import job and update their validation status',
   inputSchema: z.object({ jobId: z.string() }),
   outputSchema: z.object({
@@ -11,7 +13,8 @@ export default createEndpoint({
     errorCount: z.number(),
     canCommit: z.boolean(),
   }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'validateRateImportJob');
     const job = await zite.rateImportJobs.findOne({ id: input.jobId });
     if (!job) throw new Error('Job not found');
 

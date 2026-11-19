@@ -1,3 +1,4 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
@@ -18,6 +19,7 @@ const issueSchema = z.object({
 });
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Validate a property\'s full commercial graph — profile, rooms, plans, tariff, availability — and return readiness steps and issues',
   inputSchema: z.object({ hotelId: z.string() }),
   outputSchema: z.object({
@@ -29,7 +31,8 @@ export default createEndpoint({
     completedCount: z.number(),
     totalSteps: z.number(),
   }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'validateProperty');
     const hotel = await zite.hotels.findOne({ id: input.hotelId });
     if (!hotel) throw new Error('Hotel not found');
 

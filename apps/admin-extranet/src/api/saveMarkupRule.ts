@@ -1,8 +1,10 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Create or update a markup rule',
   inputSchema: z.object({
     id: z.string().optional(),
@@ -19,7 +21,8 @@ export default createEndpoint({
     maxMarkupValue: z.number().optional(),
   }),
   outputSchema: z.object({ id: z.string() }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'saveMarkupRule');
     const record = {
       ruleName: input.ruleName,
       markupType: input.markupType,

@@ -1,3 +1,4 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
@@ -30,12 +31,14 @@ const leadSchema = z.object({
 });
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Get all Group/MICE leads with optional status filter',
   inputSchema: z.object({
     status: z.string().optional(),
   }),
   outputSchema: z.object({ leads: z.array(leadSchema) }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'getGroupLeads');
     const result = await zite.groupLeads.findAll({ limit: 500 });
     const leads = result.records
       .filter(r => !input.status || r.status === input.status)

@@ -1,8 +1,10 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Get recent activities across all bookings for the dashboard activity log',
   inputSchema: z.object({ limit: z.number().optional() }),
   outputSchema: z.array(z.object({
@@ -14,7 +16,8 @@ export default createEndpoint({
     bookingRef: z.string().optional(),
     guestName: z.string().optional(),
   })),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'getRecentActivities');
     const limit = input.limit ?? 25;
     const [activitiesRes, bookingsRes] = await Promise.all([
       zite.bookingActivities.findAll({ limit: 200 }),

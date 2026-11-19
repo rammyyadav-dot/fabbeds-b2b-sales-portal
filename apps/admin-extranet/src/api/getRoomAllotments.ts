@@ -1,8 +1,10 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Get room allotments for a hotel by date range or month',
   inputSchema: z.object({
     hotelId: z.string(),
@@ -23,7 +25,8 @@ export default createEndpoint({
       onRequest: z.number().optional(),
     })),
   }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'getRoomAllotments');
     let startStr: string;
     let endStr: string;
 

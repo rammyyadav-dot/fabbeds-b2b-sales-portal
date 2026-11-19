@@ -1,8 +1,10 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Fetch rate change audit logs with optional filtering',
   inputSchema: z.object({
     hotelId: z.string().optional(),
@@ -35,7 +37,8 @@ export default createEndpoint({
     hasMore: z.boolean(),
     total: z.number(),
   }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'getRateLogs');
     const limit = input.limit ?? 100;
     const offset = input.offset ?? 0;
 

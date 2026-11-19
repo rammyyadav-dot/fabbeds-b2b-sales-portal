@@ -1,3 +1,4 @@
+import { requireStaff } from '../lib/requireStaff';
 import { enrichCurrentUser } from '../lib/currentUser';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
@@ -16,6 +17,7 @@ function getDatesInRange(checkin: string, checkout: string): string[] {
 }
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Update booking lifecycle, require hotel confirmation for Confirmed, log activity, and release credit on terminal statuses',
   inputSchema: z.object({
     id: z.string(),
@@ -26,6 +28,7 @@ export default createEndpoint({
   }),
   outputSchema: z.object({ success: z.boolean() }),
   execute: async ({ input, context }) => {
+    await requireStaff(context, 'updateBookingStatus');
     await enrichCurrentUser(context);
     const booking = await zite.bookings.findOne({ id: input.id }) as any;
     if (!booking) throw new ZiteError({ code: 'NOT_FOUND', message: 'Booking not found' });

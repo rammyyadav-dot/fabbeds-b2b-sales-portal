@@ -1,8 +1,10 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Delete a rate plan — blocked if daily rates or bookings depend on it; offers deactivation instead',
   inputSchema: z.object({ id: z.string(), force: z.boolean().optional() }),
   outputSchema: z.object({
@@ -13,7 +15,8 @@ export default createEndpoint({
       bookings: z.number(),
     }).optional(),
   }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'deleteRatePlan');
     const { records: dailyRates } = await zite.dailyRates.findAll({
       filters: { ratePlan: { contains: input.id } },
       limit: 1,

@@ -1,8 +1,10 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Get all bookings for admin with reservation/document/credit fields',
   inputSchema: z.object({
     status: z.string().optional(),
@@ -37,7 +39,8 @@ export default createEndpoint({
       netTotal: z.number().optional(),
     })),
   }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'getBookings');
     const validStatuses = ['Pending','Awaiting Hotel','Awaiting Payment','Confirmed','Cancelled','Approved','Rejected'];
     const filters = (input.status && validStatuses.includes(input.status)) ? { status: input.status } : {};
     const [bookingsRes, hotelsRes, roomTypesRes] = await Promise.all([

@@ -1,8 +1,10 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Get meal plan supplement rates for a hotel, returning per-record data',
   inputSchema: z.object({
     hotelId: z.string(),
@@ -18,7 +20,8 @@ export default createEndpoint({
       childRate: z.number().optional(),
     })),
   }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'getMealPlanRates');
     const { hotelId, year, month } = input;
     const monthStr = String(month).padStart(2, '0');
     const startDate = `${year}-${monthStr}-01`;

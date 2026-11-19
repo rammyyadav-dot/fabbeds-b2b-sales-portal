@@ -1,8 +1,10 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'List all rate import jobs, optionally filtered by hotel',
   inputSchema: z.object({
     hotelId: z.string().optional(),
@@ -22,7 +24,8 @@ export default createEndpoint({
       currency: z.string().optional(),
     })),
   }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'getRateImportJobs');
     const filters: any = {};
     if (input.hotelId) filters.hotel = input.hotelId;
 

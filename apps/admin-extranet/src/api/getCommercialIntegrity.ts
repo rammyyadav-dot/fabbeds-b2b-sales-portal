@@ -1,9 +1,11 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 import { linkedId, CANONICAL_MEAL_PLANS, safeNum } from '@project/pricing/hotelPricing';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Commercial integrity summary for one hotel',
   inputSchema: z.object({ hotelId: z.string() }),
   outputSchema: z.object({
@@ -19,7 +21,8 @@ export default createEndpoint({
     issueCount: z.number(),
     issues: z.array(z.string()),
   }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'getCommercialIntegrity');
     const today = new Date();
     const start = today.toISOString().slice(0, 10);
     const endDate = new Date(today);

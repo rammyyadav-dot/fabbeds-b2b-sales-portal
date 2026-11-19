@@ -1,3 +1,4 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
@@ -22,6 +23,7 @@ const CANCELLATION_VALUES: Record<string, string> = {
 };
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Create or update a rate plan with cascading selectors, duplicate check and meal plan master link',
   inputSchema: z.object({
     id: z.string().optional(),
@@ -52,7 +54,8 @@ export default createEndpoint({
     excludedCountryIds: z.array(z.string()).optional(),
   }),
   outputSchema: z.object({ id: z.string(), ratePlanName: z.string(), ratePlanCode: z.string() }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'saveRatePlan');
     // An edit must never silently move a plan to a different property.
     if (input.id) {
       const current = await zite.ratePlans.findOne({ id: input.id });

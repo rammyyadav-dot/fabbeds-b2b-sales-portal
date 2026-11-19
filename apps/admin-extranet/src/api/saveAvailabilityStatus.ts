@@ -1,8 +1,10 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Change availability only on existing rate plans for this hotel and room',
   inputSchema: z.object({
     hotelId: z.string(),
@@ -13,7 +15,8 @@ export default createEndpoint({
     })),
   }),
   outputSchema: z.object({ saved: z.number() }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'saveAvailabilityStatus');
     const roomIds = [...new Set(input.changes.map(c => c.roomTypeId))];
     const allowedRooms = new Set<string>();
     for (const id of roomIds) {

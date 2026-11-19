@@ -1,3 +1,4 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
@@ -30,10 +31,12 @@ const eventSchema = z.object({
 });
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Get event master records for a hotel',
   inputSchema: z.object({ hotelId: z.string().optional() }),
   outputSchema: z.object({ events: z.array(eventSchema) }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'getEventMaster');
     const filters: Record<string, string> = {};
     if (input.hotelId) filters.hotel = input.hotelId;
     const result = await zite.eventMaster.findAll({ filters, limit: 500 });

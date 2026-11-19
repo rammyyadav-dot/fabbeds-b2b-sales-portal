@@ -1,8 +1,10 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Get dashboard statistics including bookings and room nights',
   inputSchema: z.object({}),
   outputSchema: z.object({
@@ -17,7 +19,8 @@ export default createEndpoint({
     pendingBookings: z.number(),
     totalRoomNights: z.number(),
   }),
-  execute: async () => {
+  execute: async ({ context }) => {
+    await requireStaff(context, 'getDashboardStats');
     const [hotels, roomTypes, seasons, rates, markupRules, bookings] = await Promise.all([
       zite.hotels.findAll({ limit: 500 }),
       zite.roomTypes.findAll({ limit: 500 }),

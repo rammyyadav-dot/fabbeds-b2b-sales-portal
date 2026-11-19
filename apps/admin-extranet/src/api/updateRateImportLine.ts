@@ -1,8 +1,10 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Update mapping fields on a rate import line',
   inputSchema: z.object({
     lineId: z.string(),
@@ -11,7 +13,8 @@ export default createEndpoint({
     mappedMealPlan: z.string().optional(),
   }),
   outputSchema: z.object({ success: z.boolean() }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'updateRateImportLine');
     await zite.rateImportLines.update({
       id: input.lineId,
       record: {

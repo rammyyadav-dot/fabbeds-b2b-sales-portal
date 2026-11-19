@@ -1,4 +1,6 @@
+import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth, loginWithRedirect } from 'zitejs/auth';
 import { Toaster } from '@project/components/ui/sonner';
 import Layout from '@/components/Layout';
 import PartnerLayout from '@/components/PartnerLayout';
@@ -40,6 +42,12 @@ import { DmcRole } from '@/hooks/useRole';
 // ── Guards ────────────────────────────────────────────────────────────────────
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const { user } = useAppAuth();
+  const { user: ziteUser, isLoading } = useAuth();
+  useEffect(() => {
+    if (!isLoading && !ziteUser) loginWithRedirect();
+  }, [isLoading, ziteUser]);
+  // Staff endpoints verify the real Zite session server-side, so sign-in is required first.
+  if (isLoading || !ziteUser) return <div className="flex h-screen items-center justify-center text-sm text-muted-foreground">Signing you in…</div>;
   if (!user) return <Navigate to="/login" replace />;
   return <>{children}</>;
 }

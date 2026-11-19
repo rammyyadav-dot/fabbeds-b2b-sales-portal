@@ -1,3 +1,4 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { createEndpoint, ZiteError } from 'zitejs/backend';
 import { zite } from 'zitejs/db';
@@ -25,10 +26,12 @@ const inputSchema = z.object({
 });
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Creates or updates a scheduled fabBeds homepage campaign banner',
   inputSchema,
   outputSchema: z.object({ success: z.boolean(), id: z.string() }),
   execute: async ({ input, context }) => {
+    await requireStaff(context, 'saveHomepageBanner');
     await enrichCurrentUser(context);
 
     if (input.startDate && input.endDate && input.endDate < input.startDate) {

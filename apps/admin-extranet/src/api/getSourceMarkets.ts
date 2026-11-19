@@ -1,8 +1,10 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'List active source-market profiles and their country membership',
   inputSchema: z.object({}),
   outputSchema: z.object({
@@ -20,7 +22,8 @@ export default createEndpoint({
       })),
     })),
   }),
-  execute: async () => {
+  execute: async ({ context }) => {
+    await requireStaff(context, 'getSourceMarkets');
     const [marketsRes, membershipsRes, countriesRes] = await Promise.all([
       zite.sourceMarketProfiles.findAll({ filters: { status: 'Active' }, limit: 200 }),
       zite.sourceMarketCountries.findAll({ limit: 1000 }),

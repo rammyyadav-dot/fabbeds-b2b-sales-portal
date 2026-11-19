@@ -1,8 +1,10 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Auto-create missing room types and a default rate plan for each, then return their IDs for mapping',
   inputSchema: z.object({
     hotelId: z.string(),
@@ -14,7 +16,8 @@ export default createEndpoint({
     roomTypeId: z.string(),
     roomTypeName: z.string(),
   })),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'autoCreateRoomTypes');
     const hotel = await zite.hotels.findOne({ id: input.hotelId });
     if (!hotel) throw new Error('Hotel not found');
     const results: { label: string; roomTypeId: string; roomTypeName: string }[] = [];

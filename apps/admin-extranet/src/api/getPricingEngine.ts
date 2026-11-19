@@ -1,3 +1,4 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
@@ -41,6 +42,7 @@ const nightSchema = z.object({
 });
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Transparent per-night pricing engine breakdown: net → markup → floor → sell',
   inputSchema: z.object({
     hotelId: z.string(),
@@ -81,7 +83,8 @@ export default createEndpoint({
       avgSellPerNight: z.number(),
     }).optional(),
   }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'getPricingEngine');
     const dates = getDates(input.checkinDate, input.checkoutDate);
     const nights = dates.length;
     const adults = input.adults;

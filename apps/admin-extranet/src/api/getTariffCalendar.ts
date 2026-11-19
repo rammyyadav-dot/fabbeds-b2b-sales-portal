@@ -1,3 +1,4 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
@@ -40,6 +41,7 @@ const rowSchema = z.object({
 });
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Rate-plan-aware tariff calendar using exact DailyRate inventory only',
   inputSchema: z.object({
     hotelId: z.string(),
@@ -58,7 +60,8 @@ export default createEndpoint({
       rates: z.record(z.string(), rateCellSchema),
     })),
   }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'getTariffCalendar');
     const dates: string[] = [];
     const cur = new Date(input.startDate + 'T00:00:00Z');
     const end = new Date(input.endDate + 'T00:00:00Z');

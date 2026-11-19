@@ -1,3 +1,4 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
@@ -37,6 +38,7 @@ const reservationSchema = z.object({
 });
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Get all reservations',
   inputSchema: z.object({
     status: z.string().optional(),
@@ -45,7 +47,8 @@ export default createEndpoint({
   outputSchema: z.object({
     reservations: z.array(reservationSchema),
   }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'getReservations');
     const { records } = await zite.reservations.findAll({ limit: 500 });
     let reservations = records.map(r => ({
       id: r.id,

@@ -1,8 +1,10 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Apply room type and meal plan mappings to all lines in a rate import job',
   inputSchema: z.object({
     jobId: z.string(),
@@ -17,7 +19,8 @@ export default createEndpoint({
     })),
   }),
   outputSchema: z.object({ updatedCount: z.number() }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'applyRateImportMappings');
     const roomMap = new Map<string, { roomTypeId: string; roomTypeName: string }>(input.roomMappings.map(m => [m.label, { roomTypeId: m.roomTypeId, roomTypeName: m.roomTypeName }]));
     const mealMap = new Map(input.mealMappings.map(m => [m.label, m.mealPlanCode]));
 

@@ -1,9 +1,11 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { createEndpoint } from 'zitejs/backend';
 import { zite } from 'zitejs/db';
 import { enrichCurrentUser } from '../lib/currentUser';
 
 export default createEndpoint({
+  authenticated: true,
   description:'Returns the researched UAE attraction product library for admin contracting use',
   inputSchema:z.object({}),
   outputSchema:z.object({
@@ -26,7 +28,8 @@ export default createEndpoint({
       lastVerified:z.string(),
     })),
   }),
-  execute:async({context})=>{
+  execute: async ({ context }) => {
+    await requireStaff(context, 'getUaeAttractionProductLibrary');
     await enrichCurrentUser(context);
     const {records}=await zite.uaeAttractionProductLibrary.findAll({limit:500});
     return {

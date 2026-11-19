@@ -1,3 +1,4 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
@@ -7,6 +8,7 @@ const LAYER_PRIORITY: Record<string, number> = {
 };
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Save (upsert by date+roomType+hotel+layer) a single daily rate with audit trail',
   inputSchema: z.object({
     id: z.string().optional(),
@@ -28,7 +30,8 @@ export default createEndpoint({
     userId: z.string().optional(),
   }),
   outputSchema: z.object({ id: z.string() }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'saveDailyRate');
     const room = await zite.roomTypes.findOne({ id: input.roomTypeId });
     const plan = await zite.ratePlans.findOne({ id: input.ratePlanId });
     const idOf = (value: string | string[] | undefined) => Array.isArray(value) ? value[0] : value;

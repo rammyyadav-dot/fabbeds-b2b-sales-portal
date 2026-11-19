@@ -1,3 +1,4 @@
+import { requireStaff } from '../lib/requireStaff';
 import { enrichCurrentUser } from '../lib/currentUser';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
@@ -30,6 +31,7 @@ function mapLayer(layer: string): string {
 }
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Commit a validated rate import job: upsert RatePlans + write DailyRates',
   inputSchema: z.object({ jobId: z.string() }),
   outputSchema: z.object({
@@ -40,6 +42,7 @@ export default createEndpoint({
     errors: z.number(),
   }),
   execute: async ({ input, context }) => {
+    await requireStaff(context, 'commitRateImportJob');
     await enrichCurrentUser(context);
     const job = await zite.rateImportJobs.findOne({ id: input.jobId });
     if (!job) throw new Error('Job not found');

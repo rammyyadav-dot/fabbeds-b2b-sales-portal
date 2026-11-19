@@ -1,8 +1,10 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Get full reservation detail with related LPOs, invoices, payments and status history',
   inputSchema: z.object({ id: z.string() }),
   outputSchema: z.object({
@@ -84,7 +86,8 @@ export default createEndpoint({
       createdAt: z.string().nullable(),
     })),
   }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'getReservationDetail');
     const r = await zite.reservations.findOne({ id: input.id });
     if (!r) throw new Error('Reservation not found');
 

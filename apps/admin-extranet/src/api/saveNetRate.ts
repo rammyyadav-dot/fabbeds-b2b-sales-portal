@@ -1,8 +1,10 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Create or update a net rate',
   inputSchema: z.object({
     id: z.string().optional(),
@@ -20,7 +22,8 @@ export default createEndpoint({
     currency: z.string().optional(),
   }),
   outputSchema: z.object({ id: z.string() }),
-  execute: async ({ input }) => {
+  execute: async ({ input, context }) => {
+    await requireStaff(context, 'saveNetRate');
     const record = {
       hotel: input.hotelId,
       roomType: input.roomTypeId,

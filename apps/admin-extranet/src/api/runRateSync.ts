@@ -1,3 +1,4 @@
+import { requireStaff } from '../lib/requireStaff';
 import { z } from 'zod';
 import { zite } from 'zitejs/db';
 import { createEndpoint } from 'zitejs/backend';
@@ -13,6 +14,7 @@ const discrepancySchema = z.object({
 });
 
 export default createEndpoint({
+  authenticated: true,
   description: 'Run full rate sync & recheck workflow – validates Daily Rates against Net Rates',
   inputSchema: z.object({}),
   outputSchema: z.object({
@@ -38,7 +40,8 @@ export default createEndpoint({
     validationErrors: z.array(z.string()),
     checkedAt: z.string(),
   }),
-  execute: async () => {
+  execute: async ({ context }) => {
+    await requireStaff(context, 'runRateSync');
     const runId = `SYNC-${Date.now()}`;
     const startTime = new Date().toISOString();
     const discrepancies: z.infer<typeof discrepancySchema>[] = [];
